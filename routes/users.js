@@ -26,8 +26,17 @@ router.post('/', authenticate, permit('admin'), registerValidation, async (req, 
 
 // List users
 router.get('/', authenticate, permit('admin'), async (req, res) => {
-  const users = await User.find({}, '-password').lean();
-  res.json(users);
+  try {
+    const users = await User.find(
+      { role: 'user' },     // <-- filter to include only role 'user'
+      '-password'           // <-- exclude password field
+    ).lean();
+
+    res.json(users);
+
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 // Update user
